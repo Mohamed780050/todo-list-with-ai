@@ -5,8 +5,96 @@ document.addEventListener('DOMContentLoaded', () => {
     const tasksCounter = document.getElementById('tasks-counter');
     const clearCompletedBtn = document.getElementById('clear-completed');
     const filterBtns = document.querySelectorAll('.filter-btn');
+    const themeToggle = document.getElementById('theme-toggle');
+    const langToggle = document.getElementById('lang-toggle');
 
     let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+    // Translations
+    const translations = {
+        en: {
+            'title': 'Todo List',
+            'add-task': 'Add your task...',
+            'all': 'All',
+            'active': 'Active',
+            'completed': 'Completed',
+            'clear-completed': 'Clear Completed',
+            'tasks-left': (n) => `${n} task${n !== 1 ? 's' : ''} left`,
+        },
+        ar: {
+            'title': 'قائمة المهام',
+            'add-task': 'أضف مهمة جديدة...',
+            'all': 'الكل',
+            'active': 'النشطة',
+            'completed': 'المكتملة',
+            'clear-completed': 'مسح المكتملة',
+            'tasks-left': (n) => `${n} ${n === 1 ? 'مهمة متبقية' : 'مهام متبقية'}`,
+        }
+    };
+
+    // Language handling
+    let currentLang = localStorage.getItem('lang') || 'en';
+    
+    function setLanguage(lang) {
+        currentLang = lang;
+        document.documentElement.lang = lang;
+        document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+        localStorage.setItem('lang', lang);
+        langToggle.querySelector('span').textContent = lang.toUpperCase();
+        updateTranslations();
+    }
+
+    function updateTranslations() {
+        // Update all elements with data-i18n attribute
+        document.querySelectorAll('[data-i18n]').forEach(element => {
+            const key = element.getAttribute('data-i18n');
+            if (key === 'tasks-left') {
+                const activeTasks = tasks.filter(task => !task.completed).length;
+                element.textContent = translations[currentLang][key](activeTasks);
+            } else {
+                element.textContent = translations[currentLang][key];
+            }
+        });
+
+        // Update placeholder attributes
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+            const key = element.getAttribute('data-i18n-placeholder');
+            element.placeholder = translations[currentLang][key];
+        });
+    }
+
+    if (currentLang) {
+        setLanguage(currentLang);
+    }
+
+    langToggle.addEventListener('click', () => {
+        setLanguage(currentLang === 'en' ? 'ar' : 'en');
+    });
+
+    // Theme handling
+    const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    const currentTheme = localStorage.getItem('theme');
+    
+    function setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        themeToggle.innerHTML = theme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    }
+
+    if (currentTheme) {
+        setTheme(currentTheme);
+    } else {
+        setTheme(prefersDarkScheme.matches ? 'dark' : 'light');
+    }
+
+    themeToggle.addEventListener('click', () => {
+        const theme = document.documentElement.getAttribute('data-theme');
+        setTheme(theme === 'light' ? 'dark' : 'light');
+    });
+
+    prefersDarkScheme.addEventListener('change', (e) => {
+        setTheme(e.matches ? 'dark' : 'light');
+    });
 
     function saveTasks() {
         localStorage.setItem('tasks', JSON.stringify(tasks));
@@ -14,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateTasksCounter() {
         const activeTasks = tasks.filter(task => !task.completed).length;
-        tasksCounter.textContent = `${activeTasks} task${activeTasks !== 1 ? 's' : ''} left`;
+        tasksCounter.textContent = translations[currentLang]['tasks-left'](activeTasks);
     }
 
     function createTaskElement(task) {

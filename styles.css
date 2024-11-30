@@ -1,3 +1,52 @@
+:root {
+    --bg-gradient-light: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --bg-gradient-dark: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+    --app-bg-light: rgba(255, 255, 255, 0.95);
+    --app-bg-dark: rgba(26, 32, 44, 0.95);
+    --text-primary-light: #2d3748;
+    --text-primary-dark: #e2e8f0;
+    --text-secondary-light: #718096;
+    --text-secondary-dark: #a0aec0;
+    --accent-color: #667eea;
+    --accent-color-dark: #7f9cf5;
+    --input-bg-light: #ffffff;
+    --input-bg-dark: #2d3748;
+    --input-border-light: #e2e8f0;
+    --input-border-dark: #4a5568;
+    --task-bg-light: #f7fafc;
+    --task-bg-dark: #2d3748;
+    --completed-bg-light: #e6ffea;
+    --completed-bg-dark: #22543d;
+    --completed-accent-light: #48bb78;
+    --completed-accent-dark: #68d391;
+}
+
+[data-theme="light"] {
+    --bg-gradient: var(--bg-gradient-light);
+    --app-bg: var(--app-bg-light);
+    --text-primary: var(--text-primary-light);
+    --text-secondary: var(--text-secondary-light);
+    --accent: var(--accent-color);
+    --input-bg: var(--input-bg-light);
+    --input-border: var(--input-border-light);
+    --task-bg: var(--task-bg-light);
+    --completed-bg: var(--completed-bg-light);
+    --completed-accent: var(--completed-accent-light);
+}
+
+[data-theme="dark"] {
+    --bg-gradient: var(--bg-gradient-dark);
+    --app-bg: var(--app-bg-dark);
+    --text-primary: var(--text-primary-dark);
+    --text-secondary: var(--text-secondary-dark);
+    --accent: var(--accent-color-dark);
+    --input-bg: var(--input-bg-dark);
+    --input-border: var(--input-border-dark);
+    --task-bg: var(--task-bg-dark);
+    --completed-bg: var(--completed-bg-dark);
+    --completed-accent: var(--completed-accent-dark);
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -6,7 +55,7 @@
 }
 
 body {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--bg-gradient);
     min-height: 100vh;
     padding: 20px;
 }
@@ -17,15 +66,61 @@ body {
 }
 
 .todo-app {
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--app-bg);
     border-radius: 20px;
     padding: 30px;
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
 }
 
-h1 {
-    color: #2d3748;
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 25px;
+}
+
+.header-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.control-btn {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.control-btn:hover {
+    background-color: var(--input-border);
+}
+
+.theme-toggle {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+}
+
+.theme-toggle:hover {
+    background-color: var(--input-border);
+}
+
+h1 {
+    color: var(--text-primary);
     font-size: 2rem;
     display: flex;
     align-items: center;
@@ -33,7 +128,7 @@ h1 {
 }
 
 h1 i {
-    color: #667eea;
+    color: var(--accent);
 }
 
 .input-section {
@@ -45,29 +140,35 @@ h1 i {
 #task-input {
     flex: 1;
     padding: 12px 15px;
-    border: 2px solid #e2e8f0;
+    border: 2px solid var(--input-border);
     border-radius: 10px;
     font-size: 1rem;
     transition: border-color 0.3s ease;
+    background: var(--input-bg);
+    color: var(--text-primary);
+}
+
+#task-input::placeholder {
+    color: var(--text-secondary);
 }
 
 #task-input:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: var(--accent);
 }
 
 #add-button {
-    background: #667eea;
+    background: var(--accent);
     color: white;
     border: none;
     padding: 12px 20px;
     border-radius: 10px;
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: opacity 0.3s ease;
 }
 
 #add-button:hover {
-    background: #764ba2;
+    opacity: 0.9;
 }
 
 .filters {
@@ -79,14 +180,15 @@ h1 i {
 .filter-btn {
     padding: 8px 15px;
     border: none;
-    background: #e2e8f0;
+    background: var(--input-border);
+    color: var(--text-primary);
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .filter-btn.active {
-    background: #667eea;
+    background: var(--accent);
     color: white;
 }
 
@@ -99,7 +201,7 @@ h1 i {
     display: flex;
     align-items: center;
     padding: 12px;
-    background: #f7fafc;
+    background: var(--task-bg);
     border-radius: 10px;
     margin-bottom: 10px;
     animation: slideIn 0.3s ease;
@@ -110,7 +212,7 @@ h1 i {
 
 .task-item.dragging {
     opacity: 0.5;
-    background: #e2e8f0;
+    background: var(--input-border);
 }
 
 .task-item.drag-over {
@@ -118,23 +220,28 @@ h1 i {
 }
 
 .task-item .drag-handle {
-    color: #cbd5e0;
+    color: var(--text-secondary);
     margin-right: 10px;
     cursor: move;
     padding: 0 5px;
 }
 
 .task-item:hover .drag-handle {
-    color: #667eea;
+    color: var(--accent);
 }
 
 .task-item.completed {
-    opacity: 0.7;
+    background: var(--completed-bg);
+    border-left: 4px solid var(--completed-accent);
 }
 
 .task-item.completed .task-text {
     text-decoration: line-through;
-    color: #718096;
+    color: var(--completed-accent);
+}
+
+.task-item.completed .checkbox {
+    accent-color: var(--completed-accent);
 }
 
 .checkbox {
@@ -142,12 +249,12 @@ h1 i {
     height: 20px;
     margin-right: 15px;
     cursor: pointer;
+    accent-color: var(--accent);
 }
 
 .task-text {
     flex: 1;
-    font-size: 1rem;
-    color: #2d3748;
+    color: var(--text-primary);
 }
 
 .delete-btn {
@@ -168,21 +275,49 @@ h1 i {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: #718096;
+    color: var(--text-secondary);
     font-size: 0.9rem;
 }
 
 #clear-completed {
     background: none;
     border: none;
-    color: #667eea;
+    color: var(--accent);
     cursor: pointer;
     font-size: 0.9rem;
-    transition: color 0.3s ease;
+    transition: opacity 0.3s ease;
 }
 
 #clear-completed:hover {
-    color: #764ba2;
+    opacity: 0.8;
+}
+
+[dir="rtl"] {
+    text-align: right;
+}
+
+[dir="rtl"] .task-item {
+    border-left: none;
+    border-right: 4px solid transparent;
+}
+
+[dir="rtl"] .task-item.completed {
+    border-left: none;
+    border-right: 4px solid var(--completed-accent);
+}
+
+[dir="rtl"] .task-item .drag-handle {
+    margin-right: 0;
+    margin-left: 10px;
+}
+
+[dir="rtl"] .checkbox {
+    margin-right: 0;
+    margin-left: 15px;
+}
+
+[dir="rtl"] .delete-btn {
+    transform: scaleX(-1);
 }
 
 @keyframes slideIn {
