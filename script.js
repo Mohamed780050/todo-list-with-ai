@@ -48,9 +48,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update all elements with data-i18n attribute
         document.querySelectorAll('[data-i18n]').forEach(element => {
             const key = element.getAttribute('data-i18n');
+            console.log(key)
             if (key === 'tasks-left') {
                 const activeTasks = tasks.filter(task => !task.completed).length;
                 element.textContent = translations[currentLang][key](activeTasks);
+                console.log(translations[currentLang][key](activeTasks))
             } else {
                 element.textContent = translations[currentLang][key];
             }
