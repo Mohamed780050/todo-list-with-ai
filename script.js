@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'time-left': (time) => `${time} left`,
             'overdue': 'Overdue',
             'due-soon': 'Due soon',
+            'completed': 'Completed',
         },
         ar: {
             'title': 'قائمة المهام',
@@ -40,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'time-left': (time) => `متبقي ${time}`,
             'overdue': 'متأخر',
             'due-soon': 'قريباً',
+            'completed': 'مكتملة',
         }
     };
 
@@ -175,14 +177,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const timeInfo = item.querySelector('.time-info');
             if (timeInfo) {
                 const dueDate = timeInfo.dataset.time;
+                const isCompleted = item.classList.contains('completed');
                 if (dueDate) {
-                    const status = getTimeStatus(dueDate);
+                    const status = getTimeStatus(dueDate, isCompleted);
                     const timeLeft = formatTimeLeft(dueDate);
                     
                     timeInfo.className = `time-info ${status}`;
                     timeInfo.innerHTML = `
                         <i class="fas fa-clock"></i>
-                        <span>${status === 'urgent' ? translations[currentLang]['overdue'] :
+                        <span>${isCompleted ? translations[currentLang]['completed'] :
+                               status === 'urgent' ? translations[currentLang]['overdue'] :
                                status === 'near' ? translations[currentLang]['due-soon'] :
                                translations[currentLang]['time-left'](timeLeft)}</span>
                     `;
@@ -200,9 +204,9 @@ document.addEventListener('DOMContentLoaded', () => {
         li.draggable = true;
         
         const timeHtml = task.dueDate ? `
-            <div class="time-info ${getTimeStatus(task.dueDate)}" data-time="${task.dueDate}">
+            <div class="time-info ${getTimeStatus(task.dueDate, task.completed)}" data-time="${task.dueDate}">
                 <i class="fas fa-clock"></i>
-                <span>${formatTimeLeft(task.dueDate)}</span>
+                <span>${task.completed ? translations[currentLang]['completed'] : formatTimeLeft(task.dueDate)}</span>
             </div>
         ` : '';
 

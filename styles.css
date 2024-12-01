@@ -244,6 +244,19 @@ h1 i {
   accent-color: var(--completed-accent);
 }
 
+.task-item.completed .time-info {
+  color: var(--completed-accent);
+}
+
+.task-item.completed .time-info.urgent,
+.task-item.completed .time-info.near {
+  color: var(--completed-accent);
+}
+
+.task-item.completed .time-info i {
+  color: var(--completed-accent);
+}
+
 .checkbox {
   width: 20px;
   height: 20px;
