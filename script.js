@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const taskInput = document.getElementById('task-input');
+    const taskTime = document.getElementById('task-time');
     const addButton = document.getElementById('add-button');
     const taskList = document.getElementById('task-list');
     const tasksCounter = document.getElementById('tasks-counter');
@@ -23,6 +24,9 @@ document.addEventListener('DOMContentLoaded', () => {
             'clear-completed': 'Clear Completed',
             'tasks-left': (n) => `${n} task${n !== 1 ? 's' : ''} left`,
             'progress': 'Progress',
+            'time-left': (time) => `${time} left`,
+            'overdue': 'Overdue',
+            'due-soon': 'Due soon',
         },
         ar: {
             'title': 'قائمة المهام',
@@ -33,6 +37,9 @@ document.addEventListener('DOMContentLoaded', () => {
             'clear-completed': 'مسح المكتملة',
             'tasks-left': (n) => `${n} ${n === 1 ? 'مهمة متبقية' : 'مهام متبقية'}`,
             'progress': 'التقدم',
+            'time-left': (time) => `متبقي ${time}`,
+            'overdue': 'متأخر',
+            'due-soon': 'قريباً',
         }
     };
 
@@ -134,14 +141,76 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function formatTimeLeft(dueDate) {
+        const now = new Date();
+        const due = new Date(dueDate);
+        const diff = due - now;
+        
+        if (diff < 0) return 'overdue';
+        
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        
+        if (days > 0) return `${days}d ${hours}h`;
+        if (hours > 0) return `${hours}h ${minutes}m`;
+        return `${minutes}m`;
+    }
+
+    function getTimeStatus(dueDate) {
+        if (!dueDate) return '';
+        
+        const now = new Date();
+        const due = new Date(dueDate);
+        const diff = due - now;
+        
+        if (diff < 0) return 'urgent';
+        if (diff < 1000 * 60 * 60 * 24) return 'near';
+        return '';
+    }
+
+    function updateTaskTimes() {
+        const taskItems = document.querySelectorAll('.task-item');
+        taskItems.forEach(item => {
+            const timeInfo = item.querySelector('.time-info');
+            if (timeInfo) {
+                const dueDate = timeInfo.dataset.time;
+                if (dueDate) {
+                    const status = getTimeStatus(dueDate);
+                    const timeLeft = formatTimeLeft(dueDate);
+                    
+                    timeInfo.className = `time-info ${status}`;
+                    timeInfo.innerHTML = `
+                        <i class="fas fa-clock"></i>
+                        <span>${status === 'urgent' ? translations[currentLang]['overdue'] :
+                               status === 'near' ? translations[currentLang]['due-soon'] :
+                               translations[currentLang]['time-left'](timeLeft)}</span>
+                    `;
+                }
+            }
+        });
+    }
+
+    // Update times every minute
+    setInterval(updateTaskTimes, 60000);
+
     function createTaskElement(task) {
         const li = document.createElement('li');
         li.className = `task-item ${task.completed ? 'completed' : ''}`;
         li.draggable = true;
+        
+        const timeHtml = task.dueDate ? `
+            <div class="time-info ${getTimeStatus(task.dueDate)}" data-time="${task.dueDate}">
+                <i class="fas fa-clock"></i>
+                <span>${formatTimeLeft(task.dueDate)}</span>
+            </div>
+        ` : '';
+
         li.innerHTML = `
             <i class="fas fa-grip-vertical drag-handle"></i>
             <input type="checkbox" class="checkbox" ${task.completed ? 'checked' : ''}>
             <span class="task-text">${task.text}</span>
+            ${timeHtml}
             <button class="delete-btn">
                 <i class="fas fa-trash"></i>
             </button>
@@ -238,13 +307,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const newTask = {
             id: Date.now(),
             text: text,
-            completed: false
+            completed: false,
+            dueDate: taskTime.value || null
         };
 
         tasks.push(newTask);
         const taskElement = createTaskElement(newTask);
         taskList.appendChild(taskElement);
         saveTasks();
+        
+        // Clear inputs
+        taskInput.value = '';
+        taskTime.value = '';
     }
 
     function filterTasks(filterType) {
@@ -267,13 +341,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event Listeners
     addButton.addEventListener('click', () => {
         addTask(taskInput.value);
-        taskInput.value = '';
     });
 
     taskInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             addTask(taskInput.value);
-            taskInput.value = '';
         }
     });
 

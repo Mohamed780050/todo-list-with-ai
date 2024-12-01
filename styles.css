@@ -388,3 +388,44 @@ h1 i {
     transform: translateY(0);
   }
 }
+
+.task-time {
+  padding: 12px 15px;
+  border: 2px solid var(--input-border);
+  border-radius: 10px;
+  font-size: 1rem;
+  background: var(--input-bg);
+  color: var(--text-primary);
+  transition: border-color 0.3s ease;
+}
+
+.task-time:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.task-item .time-info {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-left: 10px;
+}
+
+.task-item .time-info i {
+  font-size: 0.9rem;
+}
+
+.task-item .time-info.urgent {
+  color: #e53e3e;
+}
+
+.task-item .time-info.near {
+  color: #ecc94b;
+}
+
+[dir="rtl"] .task-item .time-info {
+  margin-left: 0;
+  margin-right: 10px;
+}
