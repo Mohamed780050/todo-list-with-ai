@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterBtns = document.querySelectorAll('.filter-btn');
     const themeToggle = document.getElementById('theme-toggle');
     const langToggle = document.getElementById('lang-toggle');
+    const progressFill = document.querySelector('.progress-fill');
+    const progressPercentage = document.querySelector('.progress-percentage');
 
     let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
@@ -20,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'completed': 'Completed',
             'clear-completed': 'Clear Completed',
             'tasks-left': (n) => `${n} task${n !== 1 ? 's' : ''} left`,
+            'progress': 'Progress',
         },
         ar: {
             'title': 'قائمة المهام',
@@ -29,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'completed': 'المكتملة',
             'clear-completed': 'مسح المكتملة',
             'tasks-left': (n) => `${n} ${n === 1 ? 'مهمة متبقية' : 'مهام متبقية'}`,
+            'progress': 'التقدم',
         }
     };
 
@@ -48,11 +52,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update all elements with data-i18n attribute
         document.querySelectorAll('[data-i18n]').forEach(element => {
             const key = element.getAttribute('data-i18n');
-            console.log(key)
             if (key === 'tasks-left') {
                 const activeTasks = tasks.filter(task => !task.completed).length;
                 element.textContent = translations[currentLang][key](activeTasks);
-                console.log(translations[currentLang][key](activeTasks))
+            } else if (key === 'progress') {
+                element.textContent = translations[currentLang][key];
             } else {
                 element.textContent = translations[currentLang][key];
             }
@@ -100,11 +104,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function saveTasks() {
         localStorage.setItem('tasks', JSON.stringify(tasks));
+        updateTasksCounter();
+        updateProgress();
     }
 
     function updateTasksCounter() {
         const activeTasks = tasks.filter(task => !task.completed).length;
         tasksCounter.textContent = translations[currentLang]['tasks-left'](activeTasks);
+    }
+
+    function updateProgress() {
+        const totalTasks = tasks.length;
+        const completedTasks = tasks.filter(task => task.completed).length;
+        const percentage = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
+        
+        progressFill.style.width = `${percentage}%`;
+        progressPercentage.textContent = `${percentage}%`;
+        
+        // Add animation class
+        progressFill.classList.remove('animate');
+        void progressFill.offsetWidth; // Trigger reflow
+        progressFill.classList.add('animate');
+
+        // Update progress bar color based on percentage
+        if (percentage === 100) {
+            progressFill.style.background = 'var(--completed-accent)';
+        } else {
+            progressFill.style.background = 'var(--accent)';
+        }
     }
 
     function createTaskElement(task) {
@@ -125,7 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
             task.completed = checkbox.checked;
             li.classList.toggle('completed');
             saveTasks();
-            updateTasksCounter();
         });
 
         const deleteBtn = li.querySelector('.delete-btn');
@@ -133,7 +159,6 @@ document.addEventListener('DOMContentLoaded', () => {
             tasks = tasks.filter(t => t !== task);
             li.remove();
             saveTasks();
-            updateTasksCounter();
         });
 
         // Add drag and drop event listeners
@@ -220,7 +245,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const taskElement = createTaskElement(newTask);
         taskList.appendChild(taskElement);
         saveTasks();
-        updateTasksCounter();
     }
 
     function filterTasks(filterType) {
@@ -279,4 +303,5 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial render
     renderTasks();
     updateTasksCounter();
+    updateProgress();
 });

@@ -292,6 +292,64 @@ h1 i {
   opacity: 0.8;
 }
 
+/* Progress Bar Styles */
+.progress-section {
+    margin-bottom: 20px;
+    padding: 10px 0;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+.progress-text {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.progress-percentage {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.progress-bar {
+    height: 8px;
+    background: var(--input-border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 4px;
+    width: 0;
+    transition: width 0.3s ease;
+}
+
+/* Progress Bar Animation */
+@keyframes progressFill {
+    from {
+        transform: translateX(-100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+.progress-fill.animate {
+    animation: progressFill 0.5s ease-out;
+}
+
+[dir="rtl"] .progress-fill {
+    transform-origin: right;
+}
+
 [dir="rtl"] {
   text-align: right;
 }
